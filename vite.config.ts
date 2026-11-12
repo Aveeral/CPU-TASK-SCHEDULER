@@ -14,6 +14,7 @@ const vitestConfig = defineVitestConfig({
 // https://vite.dev/config/
 export default mergeConfig(
   defineConfig({
+    base: './',
     plugins: [react()],
   }),
   vitestConfig
