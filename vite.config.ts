@@ -14,7 +14,7 @@ const vitestConfig = defineVitestConfig({
 // https://vite.dev/config/
 export default mergeConfig(
   defineConfig({
-    base: './',
+    base: '/CPU-TASK-SCHEDULER/',
     plugins: [react()],
   }),
   vitestConfig
