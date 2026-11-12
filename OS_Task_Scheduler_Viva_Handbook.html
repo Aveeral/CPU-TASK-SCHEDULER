@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complete OS Viva Handbook - Single-Core CPU Scheduling Simulator</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {
+      delimiters: [
+        {left: '6320', right: '6320', display: true},
+        {left: '$', right: '$', display: false}
+      ]
+    });"></script>
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-light: #eff6ff;
+      --text: #1f2937;
+      --text-muted: #4b5563;
+      --border: #e5e7eb;
+      --code-bg: #f8fafc;
+      --accent: #2563eb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--text);
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 24px;
+      background: #ffffff;
+    }
+
+    h1, h2, h3, h4 {
+      color: #0f172a;
+      font-weight: 700;
+      margin-top: 1.8em;
+      margin-bottom: 0.6em;
+      line-height: 1.25;
+      page-break-after: avoid;
+    }
+
+    h1 {
+      font-size: 2rem;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 8px;
+      margin-top: 2.2em;
+    }
+
+    /* First title h1 */
+    body > h1:first-of-type {
+      font-size: 2.4rem;
+      margin-top: 0;
+      color: var(--primary);
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      color: #1e40af;
+      margin-top: 1.2em;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      color: #1e3a8a;
+    }
+
+    p {
+      margin-top: 0.8em;
+      margin-bottom: 0.8em;
+    }
+
+    blockquote {
+      margin: 1.5em 0;
+      padding: 14px 20px;
+      background: var(--primary-light);
+      border-left: 5px solid var(--accent);
+      border-radius: 4px;
+      color: #1e3a8a;
+    }
+
+    blockquote p {
+      margin: 4px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95rem;
+      page-break-inside: avoid;
+    }
+
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 10px 14px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f1f5f9;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    tr:nth-child(even) td {
+      background-color: #f8fafc;
+    }
+
+    pre {
+      background: var(--code-bg);
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 16px;
+      overflow-x: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.88rem;
+      line-height: 1.45;
+      page-break-inside: avoid;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.9em;
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #0f172a;
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+    }
+
+    ul, ol {
+      padding-left: 24px;
+      margin-top: 0.6em;
+      margin-bottom: 0.8em;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    hr {
+      border: 0;
+      height: 1px;
+      background: #e2e8f0;
+      margin: 2em 0;
+    }
+
+    .katex {
+      font-size: 1.05em;
+    }
+
+    @media print {
+      body {
+        max-width: 100%;
+        padding: 0;
+        font-size: 11pt;
+      }
+
+      @page {
+        margin: 18mm 15mm;
+        size: A4;
+      }
+
+      h1 {
+        page-break-before: always;
+      }
+
+      body > h1:first-of-type,
+      h1#table-of-contents {
+        page-break-before: avoid;
+      }
+
+      table, pre, blockquote {
+        page-break-inside: avoid;
+      }
+
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Complete OS Viva Handbook &amp; Technical Reference</h1>
+<h2>Single-Core CPU Scheduling Simulator</h2>
+<blockquote>
+<p><strong>Course:</strong> Operating Systems<br><strong>Topic:</strong> CPU Scheduling, Process State Machine, Queueing Models, and Performance Metrics<br><strong>Repository:</strong> <a href="https://github.com/Aveeral/CPU-TASK-SCHEDULER">https://github.com/Aveeral/CPU-TASK-SCHEDULER</a></p>
+</blockquote>
+<hr>
+<h1>TABLE OF CONTENTS</h1>
+<ol>
+<li><a href="#1-architecture--system-design">Architecture &amp; System Design</a></li>
+<li><a href="#2-process-lifecycle--the-state-machine">Process Lifecycle &amp; The State Machine</a></li>
+<li><a href="#3-the-7-step-simulation-engine-loop">The 7-Step Simulation Engine Loop</a></li>
+<li><a href="#4-in-depth-scheduling-algorithms">In-Depth Scheduling Algorithms</a></li>
+<li><a href="#5-mathematical-formulas--metric-calculations">Mathematical Formulas &amp; Metric Calculations</a></li>
+<li><a href="#6-textbook-benchmarks--test-cases">Textbook Benchmarks &amp; Test Cases</a></li>
+<li><a href="#7-top-15-viva-questions--model-answers">Top 15 Viva Questions &amp; Model Answers</a></li>
+<li><a href="#8-demo-walkthrough-script-for-presentation-day">Demo Walkthrough Script for Presentation Day</a></li>
+</ol>
+<hr>
+<h1>1. Architecture &amp; System Design</h1>
+<h3>1.1 Decoupled Architecture (Engine vs. UI)</h3>
+<p>A core design requirement was strict decoupling between the simulation core and the user interface:</p>
+<ul>
+<li><strong><code>src/engine/</code> (Pure TypeScript Core):</strong><ul>
+<li><strong>Zero UI / React imports.</strong> Can be run in Node.js, CLI, or test runners without a browser DOM.</li>
+<li>Implements Process Control Blocks (<code>PCB</code>), custom queues (<code>FIFOQueue</code>, <code>PriorityQueue</code>, <code>MultiLevelQueue</code>), scheduling algorithms, context-switch logic, and metrics calculation.</li>
+<li>Time is discrete and modeled tick-by-tick ($t = 0, 1, 2, \dots$).</li>
+</ul>
+</li>
+<li><strong><code>src/components/</code> (React Visualization Layer):</strong><ul>
+<li>Purely observational. Takes snapshots generated by the engine and renders the Gantt chart, Ready Queue, CPU state, and comparison charts.</li>
+</ul>
+</li>
+</ul>
+<pre><code>┌────────────────────────────────────────────────────────┐
+│                   React Dashboard (UI)                 │
+│  [ProcessForm] [Controls] [GanttChart] [QueueView]      │
+└───────────────────────────▲────────────────────────────┘
+                            │ Reads Snapshots &amp; Results
+┌───────────────────────────┴────────────────────────────┐
+│              Pure TypeScript Engine (simulator.ts)     │
+│  • Tick Loop (t=0,1,2...)  • State Machine Enforcer    │
+│  • Context Switch Delays   • I/O Waiting Queue         │
+│  • Metrics Calculator      • Algorithm Registry        │
+└───────────────────────────▲────────────────────────────┘
+                            │ Dispatches &amp; Preempts
+┌───────────────────────────┴────────────────────────────┐
+│                    Algorithm Implementations           │
+│     FCFS │ SJF │ SRTF │ Round Robin │ Priority │ MLFQ  │
+└────────────────────────────────────────────────────────┘
+</code></pre>
+<hr>
+<h1>2. Process Lifecycle &amp; The State Machine</h1>
+<h3>2.1 The 5 Legal Process States</h3>
+<p>The simulator implements the classical 5-state model defined in Silberschatz, Galvin &amp; Gagne:</p>
+<ol>
+<li><strong><code>NEW</code></strong>: Process has been created with arrival time $A$ and burst $B$, waiting for clock $t \ge A$.</li>
+<li><strong><code>READY</code></strong>: Process has arrived and is enqueued in the ready queue, waiting for CPU dispatch.</li>
+<li><strong><code>RUNNING</code></strong>: Process is currently allocated the single CPU core and executing instructions.</li>
+<li><strong><code>WAITING</code></strong>: Process is blocked waiting for an I/O burst to complete.</li>
+<li><strong><code>TERMINATED</code></strong>: Process has completed its total CPU burst ($remainingTime = 0$) and exited.</li>
+</ol>
+<h3>2.2 Transition Adjacency Map</h3>
+<p>Illegal transitions throw descriptive errors at runtime via <code>transition()</code> in <code>pcb.ts</code>:</p>
+<pre><code>           admit (t &gt;= arrivalTime)
+  [ NEW ] ─────────────────────────► [ READY ] ◄────────┐
+                                         │              │
+                                dispatch │   preempt    │ I/O complete
+                                         ▼              │
+                                    [ RUNNING ] ────────┤
+                                      │    │            │
+                           I/O start  │    │ done       │
+                                      ▼    ▼            │
+                                 [ WAITING ] ───────────┘
+                                           │
+                                           ▼ (when remainingTime == 0)
+                                    [ TERMINATED ]
+</code></pre>
+<table>
+<thead>
+<tr>
+<th align="left">Source State</th>
+<th align="left">Legal Destinations</th>
+<th align="left">Illegal Destinations (Throws Error)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong><code>NEW</code></strong></td>
+<td align="left"><code>READY</code></td>
+<td align="left"><code>RUNNING</code>, <code>WAITING</code>, <code>TERMINATED</code></td>
+</tr>
+<tr>
+<td align="left"><strong><code>READY</code></strong></td>
+<td align="left"><code>RUNNING</code></td>
+<td align="left"><code>NEW</code>, <code>WAITING</code>, <code>TERMINATED</code></td>
+</tr>
+<tr>
+<td align="left"><strong><code>RUNNING</code></strong></td>
+<td align="left"><code>READY</code>, <code>WAITING</code>, <code>TERMINATED</code></td>
+<td align="left"><code>NEW</code></td>
+</tr>
+<tr>
+<td align="left"><strong><code>WAITING</code></strong></td>
+<td align="left"><code>READY</code></td>
+<td align="left"><code>NEW</code>, <code>RUNNING</code>, <code>TERMINATED</code></td>
+</tr>
+<tr>
+<td align="left"><strong><code>TERMINATED</code></strong></td>
+<td align="left"><em>(None — Terminal State)</em></td>
+<td align="left"><code>NEW</code>, <code>READY</code>, <code>RUNNING</code>, <code>WAITING</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h1>3. The 7-Step Simulation Engine Loop</h1>
+<p>At each discrete integer clock tick $t$, the simulation loop executes these 7 steps in exact order:</p>
+<ol>
+<li><strong>Admit Arrivals (<code>NEW</code> $\to$ <code>READY</code>):</strong>
+Any process with $p.state == NEW$ and $p.arrivalTime \le t$ transitions to <code>READY</code> and calls <code>scheduler.onArrival(p, ctx)</code>.</li>
+<li><strong>Update I/O Queue (<code>WAITING</code> $\to$ <code>READY</code>):</strong>
+Processes in <code>waitingQueue</code> decrement <code>ioCountdown</code>. When <code>ioCountdown == 0</code>, the process transitions back to <code>READY</code> and calls <code>scheduler.onArrival(p, ctx)</code>.</li>
+<li><strong>Context Switch Delay Handling:</strong>
+If a context switch is in progress (<code>csCountdown &gt; 0</code>), the CPU logs an <strong>Idle</strong> tick and advances $t$. No process executes productive instructions during this tick.</li>
+<li><strong>Check Preemption:</strong>
+If a process is currently running, the simulator calls <code>scheduler.shouldPreempt(running, ctx)</code>. If <code>true</code>:<ul>
+<li><code>running</code> transitions to <code>READY</code> and is passed to <code>scheduler.onArrival(running, ctx)</code>.</li>
+<li><code>running</code> becomes <code>null</code>.</li>
+</ul>
+</li>
+<li><strong>Dispatch:</strong>
+If the CPU is idle, <code>scheduler.pickNext(ctx)</code> selects the next job. If <code>config.contextSwitchCost &gt; 0</code>, idle overhead ticks are inserted first.</li>
+<li><strong>Execute 1 Tick:</strong>
+The running process executes:<ul>
+<li><code>running.remainingTime--</code></li>
+<li><code>running.cpuTicksDone++</code></li>
+<li><code>busyTicks++</code></li>
+<li>A snapshot is captured recording the exact system state for step-through playback.</li>
+</ul>
+</li>
+<li><strong>Handle Completion / I/O Burst:</strong><ul>
+<li>If <code>cpuTicksDone</code> matches an I/O burst trigger: process transitions to <code>WAITING</code> and moves to <code>waitingQueue</code>.</li>
+<li>If <code>remainingTime == 0</code>: process transitions to <code>TERMINATED</code>, <code>completionTime</code> is recorded as $t + 1$.</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h1>4. In-Depth Scheduling Algorithms</h1>
+<h3>4.1 FCFS (First-Come, First-Served)</h3>
+<ul>
+<li><strong>Type:</strong> Non-preemptive.</li>
+<li><strong>Queue Structure:</strong> Standard FIFO queue.</li>
+<li><strong>Selection:</strong> Dispatches the process that has been in the ready queue the longest.</li>
+<li><strong>Major Weakness:</strong> The <strong>Convoy Effect</strong> — a long CPU-bound process monopolizes the CPU while short, interactive jobs pile up behind it, causing high average waiting time.</li>
+</ul>
+<h3>4.2 SJF (Shortest Job First - Non-Preemptive)</h3>
+<ul>
+<li><strong>Type:</strong> Non-preemptive.</li>
+<li><strong>Queue Structure:</strong> Priority queue ordered by <code>burstTime</code>.</li>
+<li><strong>Selection:</strong> Dispatches the process with the smallest total CPU burst. Once dispatched, it cannot be interrupted until it yields or terminates.</li>
+<li><strong>Optimality:</strong> Provably minimizes average waiting time among all non-preemptive algorithms.</li>
+</ul>
+<h3>4.3 SRTF (Shortest Remaining Time First - Preemptive SJF)</h3>
+<ul>
+<li><strong>Type:</strong> Preemptive.</li>
+<li><strong>Queue Structure:</strong> Priority queue ordered by <code>remainingTime</code>.</li>
+<li><strong>Preemption Rule:</strong>
+$$\text{Preempt if: } \text{candidate.remainingTime} &lt; \text{running.remainingTime}$$</li>
+<li><strong>Preemption Boundary:</strong> If an arriving process has remaining time <strong>equal</strong> to the running process, it does <strong>not</strong> preempt (prevents useless context-switch thrashing).</li>
+</ul>
+<h3>4.4 Round Robin (RR)</h3>
+<ul>
+<li><strong>Type:</strong> Preemptive.</li>
+<li><strong>Queue Structure:</strong> FIFO queue with a dynamic time quantum counter.</li>
+<li><strong>Quantum Countdown:</strong> Tracks ticks consumed in the current time slice. When <code>ticksConsumed &gt;= timeQuantum</code>:<ul>
+<li>If <code>readyQueue</code> has waiting processes $\to$ Preempt running job, append it to the back of <code>readyQueue</code>.</li>
+<li>If <code>readyQueue</code> is empty $\to$ Renew quantum and continue without interruption (no artificial context-switch penalty).</li>
+</ul>
+</li>
+<li><strong>Simultaneous Arrival vs. Quantum Expiry Rule:</strong>
+At tick $t$, arrivals are admitted in <strong>Step 1</strong>, while preemption is evaluated in <strong>Step 4</strong>.
+Therefore: <strong>Newly arriving jobs are enqueued BEFORE the preempted job returning to the queue.</strong></li>
+</ul>
+<h3>4.5 Priority Scheduling (Preemptive &amp; Non-Preemptive)</h3>
+<ul>
+<li><strong>Configurable Direction:</strong><ul>
+<li><code>higherPriorityFirst = true</code> (Default OS convention): Lower integer = higher priority (0 is highest).</li>
+<li><code>higherPriorityFirst = false</code>: Larger integer = higher priority.</li>
+</ul>
+</li>
+<li><strong>Preemptive Mode:</strong> Preempts running job if an arrived job has strictly higher priority.</li>
+<li><strong>Starvation Solution (Aging):</strong> Every <code>agingInterval</code> ticks, all jobs waiting in <code>readyQueue</code> have their priority incremented towards the highest priority.</li>
+</ul>
+<h3>4.6 MLFQ (Multi-Level Feedback Queue)</h3>
+<ul>
+<li><strong>3 Priority Levels:</strong><ul>
+<li><strong>Level 0 (Top):</strong> Round Robin with $q = 4$ (highest priority).</li>
+<li><strong>Level 1 (Mid):</strong> Round Robin with $q = 8$ (medium priority).</li>
+<li><strong>Level 2 (Bottom):</strong> FCFS (lowest priority, runs to completion).</li>
+</ul>
+</li>
+<li><strong>Demotion Rule:</strong> If a process exhausts its quantum at Level $L$, it is demoted to $\min(L+1, 2)$.</li>
+<li><strong>Higher Queue Preemption:</strong> A job in Level 0 strictly preempts a running job in Level 1 or 2.</li>
+<li><strong>Priority Boost:</strong> Every <code>boostInterval</code> ticks (default 50), all jobs across all levels are promoted back to Level 0 to eliminate starvation.</li>
+</ul>
+<hr>
+<h1>5. Mathematical Formulas &amp; Metric Calculations</h1>
+<table>
+<thead>
+<tr>
+<th align="left">Metric</th>
+<th align="center">Symbol</th>
+<th align="left">Mathematical Formula</th>
+<th align="left">Definition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Turnaround Time</strong></td>
+<td align="center">$TAT$</td>
+<td align="left">$$TAT_i = C_i - A_i$$</td>
+<td align="left">Total elapsed time from arrival to completion.</td>
+</tr>
+<tr>
+<td align="left"><strong>Waiting Time</strong></td>
+<td align="center">$WT$</td>
+<td align="left">$$WT_i = TAT_i - B_i$$</td>
+<td align="left">Total time spent waiting in the ready queue without CPU execution.</td>
+</tr>
+<tr>
+<td align="left"><strong>Response Time</strong></td>
+<td align="center">$RT$</td>
+<td align="left">$$RT_i = S_i - A_i$$</td>
+<td align="left">Time from arrival until the process first acquires the CPU.</td>
+</tr>
+<tr>
+<td align="left"><strong>Average Waiting Time</strong></td>
+<td align="center">$\bar{W}$</td>
+<td align="left">$$\bar{W} = \frac{1}{n} \sum_{i=1}^{n} WT_i$$</td>
+<td align="left">Mean wait time across all $n$ jobs.</td>
+</tr>
+<tr>
+<td align="left"><strong>Average Turnaround</strong></td>
+<td align="center">$\bar{T}$</td>
+<td align="left">$$\bar{T} = \frac{1}{n} \sum_{i=1}^{n} TAT_i$$</td>
+<td align="left">Mean turnaround time across all $n$ jobs.</td>
+</tr>
+<tr>
+<td align="left"><strong>CPU Utilization</strong></td>
+<td align="center">$% U$</td>
+<td align="left">$$% U = \frac{\text{Busy Ticks}}{\text{Total Ticks}} \times 100$$</td>
+<td align="left">Percentage of time the CPU was executing productive process ticks.</td>
+</tr>
+<tr>
+<td align="left"><strong>Throughput</strong></td>
+<td align="center">$X$</td>
+<td align="left">$$X = \frac{n}{TotalTime}$$</td>
+<td align="left">Completed processes per unit time.</td>
+</tr>
+</tbody></table>
+<hr>
+<h1>6. Textbook Benchmarks &amp; Test Cases</h1>
+<h3>TC-1: FCFS Convoy Effect (from Silberschatz)</h3>
+<ul>
+<li><strong>Inputs:</strong> $P_1(A=0, B=24)$, $P_2(A=1, B=3)$, $P_3(A=2, B=3)$</li>
+<li><strong>Gantt:</strong> $P_1[0-24] \to P_2[24-27] \to P_3[27-30]$</li>
+<li><strong>Metrics:</strong><ul>
+<li>$P_1: TAT = 24, WT = 0, RT = 0$</li>
+<li>$P_2: TAT = 26, WT = 23, RT = 23$</li>
+<li>$P_3: TAT = 28, WT = 25, RT = 25$</li>
+<li><strong>$\bar{W} = 16.0$, $\bar{T} = 26.0$</strong> (Convoy effect clearly demonstrated).</li>
+</ul>
+</li>
+</ul>
+<h3>TC-3 &amp; TC-4: SJF vs. SRTF Benchmark</h3>
+<ul>
+<li><strong>Inputs:</strong> $P_1(0, 7)$, $P_2(2, 4)$, $P_3(4, 1)$, $P_4(5, 4)$</li>
+<li><strong>SJF (Non-Preemptive):</strong><ul>
+<li>Gantt: $P_1[0-7] \to P_3[7-8] \to P_2[8-12] \to P_4[12-16]$</li>
+<li><strong>$\bar{W} = 4.0$, $\bar{T} = 8.0$</strong></li>
+</ul>
+</li>
+<li><strong>SRTF (Preemptive):</strong><ul>
+<li>Gantt: $P_1[0-2] \to P_2[2-4] \to P_3[4-5] \to P_2[5-7] \to P_4[7-11] \to P_1[11-16]$</li>
+<li><strong>$\bar{W} = 3.0$, $\bar{T} = 7.0$</strong> (Preemption reduces average wait time from 4.0 to 3.0).</li>
+</ul>
+</li>
+</ul>
+<h3>TC-5: Round Robin ($q=4$)</h3>
+<ul>
+<li><strong>Inputs:</strong> $P_1(0, 10)$, $P_2(0, 6)$, $P_3(0, 2)$</li>
+<li><strong>Gantt:</strong> $P_1[0-4] \to P_2[4-8] \to P_3[8-10] \to P_1[10-14] \to P_2[14-16] \to P_1[16-18]$</li>
+<li><strong>Metrics:</strong><ul>
+<li>$P_1: TAT = 18, WT = 8, RT = 0$</li>
+<li>$P_2: TAT = 16, WT = 10, RT = 4$</li>
+<li>$P_3: TAT = 10, WT = 8, RT = 8$</li>
+<li><strong>$\bar{W} = 8.67$, $\bar{T} = 14.67$</strong></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h1>7. Top 15 Viva Questions &amp; Model Answers</h1>
+<h3>Q1: Prove why SJF is mathematically optimal for minimizing average waiting time.</h3>
+<p><strong>Answer:</strong>
+Let $n$ processes run in order $P_1, P_2, \dots, P_n$ with burst times $b_1, b_2, \dots, b_n$.
+The total waiting time is:
+$$W_{total} = 0 + b_1 + (b_1 + b_2) + \dots + \sum_{j=1}^{n-1} b_j = \sum_{i=1}^{n} (n - i) b_i$$
+The coefficient $(n - i)$ represents how many subsequent jobs must wait for job $i$ to finish.
+To minimize the sum of products $\sum (n - i) b_i$, the largest coefficients $(n-1, n-2, \dots)$ must multiply the smallest burst times $b_i$.
+By the <strong>Exchange Argument</strong>, swapping any out-of-order pair where $b_i &gt; b_{i+1}$ strictly increases total waiting time. Thus, ordering by non-decreasing burst times yields the absolute minimum average waiting time.</p>
+<hr>
+<h3>Q2: If SJF is provably optimal, why don&#39;t general-purpose OSs use it?</h3>
+<p><strong>Answer:</strong>
+Because in a real operating system, the kernel <strong>cannot know the future length of a process&#39;s next CPU burst</strong> before it executes.
+Operating systems address this by:</p>
+<ol>
+<li><strong>Exponential Smoothing:</strong> Predicting future bursts based on past history:
+$$\tau_{n+1} = \alpha t_n + (1 - \alpha) \tau_n$$</li>
+<li><strong>Multi-Level Feedback Queues (MLFQ):</strong> Inferring job characteristics dynamically: jobs that yield CPU quickly are assumed to be interactive (short bursts), while jobs that exhaust their time slices are demoted as CPU-bound.</li>
+</ol>
+<hr>
+<h3>Q3: What is the &quot;Convoy Effect&quot; in FCFS?</h3>
+<p><strong>Answer:</strong>
+The convoy effect occurs when a long CPU-bound process holds the CPU while numerous short I/O-bound processes wait behind it in the ready queue.
+While the CPU-bound job runs, I/O devices sit completely idle. When the long process finishes and short jobs finally run, they quickly issue I/O, leaving the CPU idle.
+This causes poor hardware utilization and high average waiting times (e.g. TC-1 gives Avg WT = 16 in FCFS vs. 3 in SRTF).</p>
+<hr>
+<h3>Q4: Explain the trade-off in selecting the Round Robin time quantum ($q$).</h3>
+<p><strong>Answer:</strong></p>
+<ul>
+<li><strong>If $q$ is too small ($q \to 0$):</strong> Known as &quot;processor sharing&quot;. System responsiveness is high, but the CPU spends an unacceptable fraction of time performing context switches instead of executing useful code.</li>
+<li><strong>If $q$ is too large ($q \to \infty$):</strong> Round Robin degrades into FCFS, reintroducing the convoy effect and high response times for interactive jobs.</li>
+<li><strong>Rule of Thumb:</strong> Configure $q$ such that <strong>roughly 80% of CPU bursts are shorter than $q$</strong>. Typically 10ms–100ms on modern hardware.</li>
+</ul>
+<hr>
+<h3>Q5: What is Starvation, and how does Aging prevent it?</h3>
+<p><strong>Answer:</strong></p>
+<ul>
+<li><strong>Starvation (Indefinite Postponement):</strong> Occurs in priority scheduling or SJF when high-priority (or short) processes continuously enter the ready queue, preventing low-priority (or long) jobs from ever getting CPU time.</li>
+<li><strong>Aging:</strong> Gradually increases the priority of waiting jobs proportional to their waiting time. Eventually, any starved job becomes the highest-priority job in the queue and is guaranteed CPU dispatch.</li>
+</ul>
+<hr>
+<h3>Q6: What physically happens during an OS context switch on real hardware?</h3>
+<p><strong>Answer:</strong></p>
+<ol>
+<li><strong>Save CPU State:</strong> General-purpose registers, program counter ($PC$), stack pointer ($SP$), and flags are written to the current process&#39;s PCB in kernel memory.</li>
+<li><strong>Update Accounting:</strong> Process state is changed (e.g. <code>RUNNING</code> $\to$ <code>READY</code>), CPU usage counters updated.</li>
+<li><strong>Select Next Job:</strong> Scheduler picks the next PCB from the ready queue.</li>
+<li><strong>Memory Management Context Switch:</strong> The page table base register ($CR3$ on x86, $TTBR0$ on ARM) is reloaded to point to the new process&#39;s address space.</li>
+<li><strong>Cache Invalidation:</strong> Translation Lookaside Buffer (TLB) entries must be flushed (unless tagged with Address Space IDs / ASIDs), and CPU caches ($L1/L2$) suffer temporary miss spikes (&quot;cold cache&quot;).</li>
+<li><strong>Restore CPU State:</strong> The saved registers and $PC$ of the new PCB are loaded into the hardware registers, and execution resumes.</li>
+</ol>
+<hr>
+<h3>Q7: In Round Robin, if process $P_B$ arrives at the exact tick process $P_A$&#39;s quantum expires, which is queued first?</h3>
+<p><strong>Answer:</strong>
+In our simulator and in standard OS theory (Silberschatz):
+<strong>The newly arriving process ($P_B$) is enqueued BEFORE the preempted process ($P_A$).</strong></p>
+<ul>
+<li>Arrivals are evaluated at the beginning of the clock cycle (Step 1).</li>
+<li>Quantum preemption is evaluated in Step 4.</li>
+<li>Therefore, $P_B$ enters the ready queue first, followed by $P_A$ returning to the tail.</li>
+</ul>
+<hr>
+<h3>Q8: How does your simulator model context-switch overhead?</h3>
+<p><strong>Answer:</strong>
+When <code>contextSwitchCost &gt; 0</code> (e.g. 2 ticks), whenever <code>pickNext()</code> selects a new process, the process is held in a <code>pendingProcess</code> buffer while the CPU executes 2 explicit <strong>Idle Overhead Ticks</strong>.
+These ticks are logged as idle blocks on the Gantt chart and snapshots, allowing students to directly observe the throughput and CPU utilization penalties caused by excessive switching.</p>
+<hr>
+<h3>Q9: What are the 5 rules of MLFQ (Multi-Level Feedback Queue)?</h3>
+<p><strong>Answer:</strong></p>
+<ol>
+<li><strong>Rule 1:</strong> If $\text{Priority}(A) &gt; \text{Priority}(B)$, $A$ runs and $B$ does not.</li>
+<li><strong>Rule 2:</strong> If $\text{Priority}(A) == \text{Priority}(B)$, $A$ and $B$ run in Round Robin using the queue&#39;s quantum.</li>
+<li><strong>Rule 3:</strong> When a job enters the system, it is placed at the highest priority queue (Level 0).</li>
+<li><strong>Rule 4:</strong> Once a job uses up its time allotment at a given level, its priority is reduced (demoted by one queue).</li>
+<li><strong>Rule 5:</strong> After some time period $S$ (Priority Boost), all jobs in the system are moved to the topmost queue to prevent starvation.</li>
+</ol>
+<hr>
+<h3>Q10: How does your scheduler handle deterministic tie-breaking?</h3>
+<p><strong>Answer:</strong>
+Every queue comparator falls through to a deterministic two-level fallback:</p>
+<ol>
+<li><strong>Primary Tie-Breaker:</strong> <strong>Arrival Time</strong> (earliest arrived process runs first).</li>
+<li><strong>Secondary Tie-Breaker:</strong> <strong>PID</strong> (lowest process ID runs first).
+This eliminates nondeterministic race conditions across all algorithms.</li>
+</ol>
+<hr>
+<h3>Q11: What is the difference between Turnaround Time and Waiting Time?</h3>
+<p><strong>Answer:</strong></p>
+<ul>
+<li><strong>Turnaround Time ($TAT = C - A$):</strong> Total lifespan of the process from arrival to termination (includes waiting time, CPU execution time, and any I/O time).</li>
+<li><strong>Waiting Time ($WT = TAT - Burst$):</strong> The total duration spent idle inside the ready queue waiting for the CPU.</li>
+</ul>
+<hr>
+<h3>Q12: What is the difference between Turnaround Time and Response Time?</h3>
+<p><strong>Answer:</strong></p>
+<ul>
+<li><strong>Turnaround Time:</strong> Time until the process finishes completely.</li>
+<li><strong>Response Time ($RT = StartTime - ArrivalTime$):</strong> Time from when a process is submitted until it produces its <strong>very first CPU response</strong>.
+In interactive systems (e.g. desktop UI), Response Time is far more important than Turnaround Time.</li>
+</ul>
+<hr>
+<h3>Q13: In SRTF, does an arriving process preempt the running process if their remaining times are equal?</h3>
+<p><strong>Answer:</strong>
+<strong>No.</strong> Preemption only occurs if the arrived job has <strong>strictly smaller</strong> remaining time ($\text{arrived.rem} &lt; \text{running.rem}$).
+Preempting on equality would cause unnecessary context-switch overhead without reducing remaining execution time.</p>
+<hr>
+<h3>Q14: How are I/O bursts handled in your simulator?</h3>
+<p><strong>Answer:</strong>
+Each process can declare an <code>ioBursts</code> schedule (e.g. after 2 CPU ticks, execute 3 ticks of I/O).
+When <code>cpuTicksDone == io.afterCpu</code>:</p>
+<ol>
+<li>Process transitions from <code>RUNNING</code> $\to$ <code>WAITING</code>.</li>
+<li>Process is enqueued in <code>ctx.waitingQueue</code> with an <code>ioCountdown</code>.</li>
+<li>The CPU is freed, allowing other ready jobs to execute.</li>
+<li>Each tick, <code>ioCountdown</code> decrements. When it hits 0, the process transitions <code>WAITING</code> $\to$ <code>READY</code>.</li>
+</ol>
+<hr>
+<h3>Q15: Why is your simulator engine written in pure TypeScript with no React dependencies?</h3>
+<p><strong>Answer:</strong></p>
+<ol>
+<li><strong>Separation of Concerns:</strong> OS kernel scheduling logic is independent of presentation technology.</li>
+<li><strong>Testability:</strong> The engine can be tested with Vitest without mocking browser DOM elements, resulting in fast execution (210 tests run in ~1 second).</li>
+<li><strong>Portability:</strong> The engine can be compiled to Node.js CLI tools, Web Workers, or embedded systems without touching UI code.</li>
+</ol>
+<hr>
+<h1>8. Demo Walkthrough Script for Presentation Day</h1>
+<p>When presenting to your professor/evaluator, follow this structured 2-minute flow:</p>
+<ol>
+<li><p><strong>Introduction (15 seconds):</strong></p>
+<blockquote>
+<p><em>&quot;Good morning. I developed a Single-Core CPU Scheduling Simulator with a decoupled pure TypeScript simulation engine and an interactive React visualizer. It models 7 scheduling policies, discrete tick execution, context-switch overhead, and I/O bursts.&quot;</em></p>
+</blockquote>
+</li>
+<li><p><strong>Demonstrate the Convoy Effect (30 seconds):</strong></p>
+<ul>
+<li>Click <strong>Load Sample Data</strong> $\to$ Pick <strong>TC-1: FCFS Basic (3 processes)</strong>.</li>
+<li>Click <strong>⚡ Run All</strong>.</li>
+<li>Show the Gantt chart:<blockquote>
+<p><em>&quot;Notice process P1 with burst 24 holds the CPU from t=0 to t=24. Short processes P2 and P3 wait 23 and 25 ticks respectively, leading to a high Average Waiting Time of 16.0 ticks.&quot;</em></p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p><strong>Demonstrate SJF/SRTF Optimality (30 seconds):</strong></p>
+<ul>
+<li>Click <strong>Algorithm</strong> dropdown $\to$ Select <strong>SRTF</strong>.</li>
+<li>Click <strong>⚡ Run All</strong>.</li>
+<li>Show how Average Waiting Time drops:<blockquote>
+<p><em>&quot;With the same workload, SRTF immediately schedules P2 and P3 first, dropping the Average Waiting Time from 16.0 down to 3.0 ticks. This demonstrates the mathematical optimality of shortest remaining time scheduling.&quot;</em></p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p><strong>Demonstrate Step-Through &amp; Ready Queue (30 seconds):</strong></p>
+<ul>
+<li>Click <strong>↺ Reset</strong>.</li>
+<li>Click <strong>Step Forward ⏭</strong> a few times:<blockquote>
+<p><em>&quot;As we step tick-by-tick, notice the Active CPU Core progress bar updating, the live Ready Queue dynamically reordering according to priority, and the Gantt chart recording each execution segment.&quot;</em></p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p><strong>Show Multi-Algorithm Benchmark (15 seconds):</strong></p>
+<ul>
+<li>Click the <strong>📊 Compare All Algorithms</strong> tab.</li>
+<li>Point to the comparative bar chart:<blockquote>
+<p><em>&quot;The comparison view runs all 7 algorithms simultaneously on the identical workload, plotting Average Waiting Time and Turnaround Time side-by-side and highlighting the optimal policy.&quot;</em></p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ol>
+
+
+</body>
+</html>
