@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OS Lab Project Report - Single-Core CPU Scheduling Simulator</title>
+  <title>OS Project Final Report - Single-Core CPU Scheduling Simulator</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
@@ -284,35 +284,6 @@
       color: var(--primary);
     }
 
-    .screenshot-placeholder {
-      border: 2px dashed #94a3b8;
-      background: #f8fafc;
-      border-radius: 6px;
-      padding: 30px 20px;
-      text-align: center;
-      margin: 20px 0 6px 0;
-      page-break-inside: avoid;
-    }
-
-    .screenshot-icon {
-      font-size: 1.5rem;
-      margin-bottom: 6px;
-      color: var(--accent);
-    }
-
-    .screenshot-title {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #0f172a;
-      margin-bottom: 4px;
-    }
-
-    .screenshot-note {
-      font-size: 0.88rem;
-      font-style: italic;
-      color: #64748b;
-    }
-
     pre {
       background: var(--code-bg);
       border: 1px solid var(--border);
@@ -406,23 +377,22 @@
       <tr><td></td><td>&nbsp;&nbsp;3.2 Flowcharts: State Machine & Simulation Engine Tick Loop</td><td>10</td></tr>
       <tr><td></td><td>&nbsp;&nbsp;3.3 Algorithms: Algorithmic Specifications (FCFS, SJF, SRTF, RR, Priority, MLFQ)</td><td>12</td></tr>
       <tr><td><strong>4</strong></td><td><strong>Screenshots & System Demonstration</strong></td><td>15</td></tr>
-      <tr><td></td><td>&nbsp;&nbsp;Figure 1: Primary Dashboard & Process Input Configuration Panel</td><td>15</td></tr>
-      <tr><td></td><td>&nbsp;&nbsp;Figure 2: Interactive Execution Timeline & Dynamic Gantt Chart</td><td>16</td></tr>
-      <tr><td></td><td>&nbsp;&nbsp;Figure 3: Active CPU Core & Live Ready Queue View</td><td>17</td></tr>
-      <tr><td></td><td>&nbsp;&nbsp;Figure 4: Comparative Multi-Algorithm Benchmark Analytics Dashboard</td><td>18</td></tr>
-      <tr><td></td><td>&nbsp;&nbsp;Figure 5: FCFS Convoy Effect vs. SRTF Preemption Gantt Comparison</td><td>19</td></tr>
-      <tr><td></td><td>&nbsp;&nbsp;Figure 6: Additional Working Output Frame Placeholder</td><td>20</td></tr>
-      <tr><td><strong>5</strong></td><td><strong>Results</strong></td><td>21</td></tr>
-      <tr><td></td><td>&nbsp;&nbsp;5.1 Benchmark Workload Verification (TC-1 to TC-6)</td><td>21</td></tr>
-      <tr><td></td><td>&nbsp;&nbsp;5.2 Quantitative Performance Metrics & Comparisons</td><td>22</td></tr>
-      <tr><td></td><td>&nbsp;&nbsp;5.3 Automated Invariant Testing & Vitest Test Harness Results</td><td>23</td></tr>
-      <tr><td><strong>6</strong></td><td><strong>Discussion</strong></td><td>24</td></tr>
-      <tr><td></td><td>&nbsp;&nbsp;6.1 Trade-Offs in Time Quantum Selection</td><td>24</td></tr>
-      <tr><td></td><td>&nbsp;&nbsp;6.2 Impact of Hardware Context Switch Latency & TLB Invalidation</td><td>25</td></tr>
-      <tr><td></td><td>&nbsp;&nbsp;6.3 Starvation Vulnerabilities & Dynamic Aging Solutions</td><td>26</td></tr>
-      <tr><td></td><td>&nbsp;&nbsp;6.4 Architectural Decoupling & Engine Robustness</td><td>27</td></tr>
-      <tr><td><strong>7</strong></td><td><strong>Conclusion (100–150 Words Constraint)</strong></td><td>28</td></tr>
-      <tr><td><strong>8</strong></td><td><strong>References (IEEE Format, All Cited in Body)</strong></td><td>29</td></tr>
+      <tr><td></td><td>&nbsp;&nbsp;Figure 3: Primary Dashboard & Process Input Configuration Panel</td><td>15</td></tr>
+      <tr><td></td><td>&nbsp;&nbsp;Figure 4: Interactive Execution Timeline & Dynamic Gantt Chart</td><td>16</td></tr>
+      <tr><td></td><td>&nbsp;&nbsp;Figure 5: Active CPU Core & Live Ready Queue View</td><td>17</td></tr>
+      <tr><td></td><td>&nbsp;&nbsp;Figure 6: Comparative Multi-Algorithm Benchmark Analytics Dashboard</td><td>18</td></tr>
+      <tr><td></td><td>&nbsp;&nbsp;Figure 7: FCFS Convoy Effect vs. SRTF Preemption Gantt Comparison</td><td>19</td></tr>
+      <tr><td><strong>5</strong></td><td><strong>Results</strong></td><td>20</td></tr>
+      <tr><td></td><td>&nbsp;&nbsp;5.1 Benchmark Workload Verification (TC-1 to TC-6)</td><td>20</td></tr>
+      <tr><td></td><td>&nbsp;&nbsp;5.2 Quantitative Performance Metrics & Comparisons</td><td>21</td></tr>
+      <tr><td></td><td>&nbsp;&nbsp;5.3 Automated Invariant Testing & Vitest Test Harness Results</td><td>22</td></tr>
+      <tr><td><strong>6</strong></td><td><strong>Discussion</strong></td><td>23</td></tr>
+      <tr><td></td><td>&nbsp;&nbsp;6.1 Trade-Offs in Time Quantum Selection</td><td>23</td></tr>
+      <tr><td></td><td>&nbsp;&nbsp;6.2 Impact of Hardware Context Switch Latency & TLB Invalidation</td><td>24</td></tr>
+      <tr><td></td><td>&nbsp;&nbsp;6.3 Starvation Vulnerabilities & Dynamic Aging Solutions</td><td>25</td></tr>
+      <tr><td></td><td>&nbsp;&nbsp;6.4 Architectural Decoupling & Engine Robustness</td><td>26</td></tr>
+      <tr><td><strong>7</strong></td><td><strong>Conclusion (100–150 Words Constraint)</strong></td><td>27</td></tr>
+      <tr><td><strong>8</strong></td><td><strong>References (IEEE Format, All Cited in Body)</strong></td><td>28</td></tr>
     </tbody>
   </table>
 
@@ -670,16 +640,6 @@ MLFQ.onPeriodicBoost(ctx):
   </div>
   <div class="figure-caption">
     <strong>Figure 7:</strong> Visual Demonstration of FCFS Convoy Effect vs. SRTF Preemption — Gantt chart comparison illustrating how long process P1 blocks short tasks in FCFS and how SRTF restores optimal scheduling.
-  </div>
-
-  <div class="screenshot-placeholder">
-    <div class="screenshot-icon">📷</div>
-    <div class="screenshot-title">[ATTACH ADDITIONAL SCREENSHOT / PHOTO HERE]</div>
-    <div class="screenshot-title">Figure 8: Additional Demonstration Screenshot or Experimental Output</div>
-    <div class="screenshot-note">(Optional: Right-click or paste any additional simulation screenshot or working photo here)</div>
-  </div>
-  <div class="figure-caption">
-    <strong>Figure 8:</strong> Additional Demonstration Screenshot or Experimental Output — Reserved frame for attaching additional execution traces, terminal test runner logs, or custom scheduling runs.
   </div>
 
   <!-- 5. RESULTS -->
