@@ -17,7 +17,7 @@ describe('Frontend UI Components', () => {
     expect(screen.getByText('Single-Core CPU Scheduling Simulator')).toBeInTheDocument();
     expect(screen.getByText(/Scheduler & Step-Through/)).toBeInTheDocument();
     expect(screen.getByText(/Compare All Algorithms/)).toBeInTheDocument();
-    expect(screen.getByText(/OS Concepts & Viva Notes/)).toBeInTheDocument();
+    expect(screen.queryByText(/OS Concepts & Viva Notes/)).not.toBeInTheDocument();
   });
 
   it('renders AlgorithmPicker and dynamically toggles quantum field', () => {
@@ -46,9 +46,9 @@ describe('Frontend UI Components', () => {
     fireEvent.click(screen.getByText(/Compare All Algorithms/));
     expect(screen.getByText(/Algorithm Performance Benchmark/)).toBeInTheDocument();
 
-    // Click Notes tab
-    fireEvent.click(screen.getByText(/OS Concepts & Viva Notes/));
-    expect(screen.getByText(/Why SJF and SRTF Are Optimal/)).toBeInTheDocument();
+    // Switch back to Simulator tab
+    fireEvent.click(screen.getByText(/Scheduler & Step-Through/));
+    expect(screen.getByText('Process Input')).toBeInTheDocument();
   });
 
   it('ProcessForm validates input before submitting', () => {

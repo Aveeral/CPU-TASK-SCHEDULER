@@ -20,7 +20,7 @@ import { getScheduler } from './engine/algorithms';
 
 export const App: React.FC = () => {
   // Navigation tabs
-  const [activeTab, setActiveTab] = useState<'simulator' | 'compare' | 'notes'>('simulator');
+  const [activeTab, setActiveTab] = useState<'simulator' | 'compare'>('simulator');
 
   // Workload processes
   const [processes, setProcesses] = useState<ProcessInput[]>(
@@ -186,12 +186,6 @@ export const App: React.FC = () => {
         >
           📊 Compare All Algorithms
         </button>
-        <button
-          className={`nav-tab ${activeTab === 'notes' ? 'active' : ''}`}
-          onClick={() => setActiveTab('notes')}
-        >
-          📖 OS Concepts &amp; Viva Notes
-        </button>
       </nav>
 
       {/* Tab 1: Simulator & Step-Through */}
@@ -258,59 +252,6 @@ export const App: React.FC = () => {
       {activeTab === 'compare' && (
         <div className="tab-content">
           <CompareView processes={processes} />
-        </div>
-      )}
-
-      {/* Tab 3: OS Concepts & Viva Notes */}
-      {activeTab === 'notes' && (
-        <div className="tab-content">
-          <div className="card notes-container">
-            <h3>1. Why SJF and SRTF Are Optimal for Average Waiting Time</h3>
-            <p>
-              Shortest Job First (SJF) and its preemptive counterpart Shortest Remaining Time First (SRTF)
-              are provably optimal in minimizing average waiting time. By scheduling shorter bursts first,
-              jobs exit the ready queue rapidly, minimizing the total cumulative waiting time accumulated across
-              all waiting processes.
-            </p>
-
-            <h3>2. The Convoy Effect (FCFS)</h3>
-            <p>
-              In FCFS, a long CPU-bound process blocks all subsequent short interactive or I/O-bound processes
-              from executing. This creates a "convoy" of waiting processes, drastically degrading average waiting
-              time and system responsiveness (e.g. TC-1 gives Avg WT = 16 for FCFS vs 3 for SRTF).
-            </p>
-
-            <h3>3. The Quantum Trade-off in Round Robin</h3>
-            <p>
-              - <strong>Small quantum:</strong> Improves responsiveness and interactive latency, but increases
-              context-switch overhead.<br />
-              - <strong>Large quantum:</strong> Reduces context-switch overhead, but degrades to FCFS and penalizes
-              short jobs.<br />
-              - <strong>Rule of Thumb:</strong> 80% of CPU bursts should be shorter than the time quantum.
-            </p>
-
-            <h3>4. Starvation and Priority Aging</h3>
-            <p>
-              In strict priority scheduling, low-priority processes may suffer indefinite postponement
-              (starvation) if higher-priority jobs continuously arrive. Aging solves this by gradually increasing
-              the priority of processes waiting in the ready queue over time.
-            </p>
-
-            <h3>5. Context Switch Overhead</h3>
-            <p>
-              A context switch requires saving CPU registers, program counter, and memory mappings into the PCB
-              and restoring the newly selected process. In our simulator, the <code>contextSwitchCost</code> parameter
-              inserts idle CPU overhead ticks, clearly demonstrating the throughput penalty of excessive preemption.
-            </p>
-
-            <h3>6. Multi-Level Feedback Queue (MLFQ)</h3>
-            <p>
-              MLFQ approximates SJF without requiring prior knowledge of process burst times. Interactive jobs
-              that yield quickly remain in high-priority short-quantum queues (Level 0), while CPU-bound processes
-              are demoted down to longer-quantum queues (Level 1 and Level 2 FCFS). A periodic priority boost
-              promotes all jobs back to Level 0 to prevent starvation.
-            </p>
-          </div>
         </div>
       )}
     </div>
